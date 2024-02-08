@@ -1,6 +1,6 @@
 import React from 'react';
-import Explore from './../components/Cards';
-import CustomHeader from './../components/CustomHeader';
+import Explore from '../components/Cards';
+import CustomHeader from '../components/CustomHeader';
 
 const HomeScreen = () => {
   const userName = 'Jane Doe';

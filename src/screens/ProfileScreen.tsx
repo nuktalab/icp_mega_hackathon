@@ -1,118 +1,59 @@
-import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { profile } from '../declarations/profile';
+import React from 'react';
+import Explore from './../components/Cards';
+import CustomHeader from './../components/CustomHeader';
 
-interface ProfileScreenProps {}
-
-const Header: React.FC<{ name: string }> = ({ name }) => (
-  <div style={styles.header}>
-    <div style={styles.headerContent}>
-      <FontAwesomeIcon icon={faUser} size="2x" color="#fff" style={styles.icon} />
-      <div style={styles.name}>Joh</div>
-    </div>
-  </div>
-);
-
-interface InfoItemProps {
-  label: string;
-  value: string;
-}
-
-const InfoItem: React.FC<InfoItemProps> = ({ label, value }) => (
-  <div style={styles.infoContainer}>
-    <div style={styles.infoLabel}>{label}</div>
-    <div style={styles.info}>{value}</div>
-  </div>
-);
-
-const ProfileScreen: React.FC<ProfileScreenProps> = () => {
-  const [userData, setUserData] = useState<{
-    id: bigint;
-    weight: bigint;
-    heigh: bigint;
-    dateOfBirth: string;
-    name: string;
-    location: string;
-  } | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await profile.getUserData(BigInt(120));
-        console.log(result[0]);
-        setUserData(result[0]); // Assuming the result is an object with user data properties
-      } catch (error) {
-        console.log('Error fetching user data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
+const HomeScreen = () => {
+  const userName = 'Jane Doe';
 
   return (
-    <div style={styles.container}>
-      {<Header name='J' />}
+    <div
+      style={{
+        width: '100%',
+        minHeight: '100vh',
+        backgroundColor: 'white',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '20px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ width: '100%' }}>
+        <CustomHeader userName={userName} />
+      </div>
 
-      <div style={styles.body}>
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '600px',
+          margin: '0px auto',
+          padding: '0px',
+          borderRadius: '10px',
+          paddingTop: '15px'
+          
+        }}
+      >
+        <div style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '10px', color: '#a53662'}}>
+          Records
+        </div>
+        <div style={{ fontSize: '16px', fontWeight: '300', marginBottom: '20px', color: '#a53662' }}>
+          View your medical passport
+        </div>
+        <Explore history={{
+                  push: function (path: string): void {
+                      throw new Error('Function not implemented.');
+                  }
+              }}        />
 
-        <InfoItem label="Location" value={userData?.location || ''} />
-        <InfoItem label="Date of Birth" value={userData?.dateOfBirth || ''} />
-        <InfoItem label="Height" value={String(userData?.heigh || '0') + ' cm'} />
-
-        <InfoItem label="Weight" value={String(userData?.weight || '0') + ' cm'} />
+        <div style={{ marginTop: '20px' }}>
+          <div>{/* Your content goes here */}</div>
+        </div>
+        {/* <div style={{ fontSize: '30px', fontWeight: 'bold' }}>
+              Explore
+        </div> */}
       </div>
     </div>
   );
 };
 
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    backgroundColor: '#a53662',
-    position: 'sticky',
-    height: '20vh',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    paddingBottom: 20,
-  },
-  icon: {
-    marginBottom: 10,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  body: {
-    padding: 20,
-  },
-  infoContainer: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-  },
-  infoLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#333',
-  },
-  info: {
-    fontSize: 20,
-    color: '#555',
-  },
-};
-
-export default ProfileScreen;
+export default HomeScreen;
