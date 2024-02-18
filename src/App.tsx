@@ -169,7 +169,7 @@ const App: React.FC = () => {
         </div>
       ) : (
         <>
-          <Home onLogin={handleLogin}/>
+          <Home onLogin={handleLogin} />
         </>
       )}
     </>
@@ -177,3 +177,7 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+
+
+
