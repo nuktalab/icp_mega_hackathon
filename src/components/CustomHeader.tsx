@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaSearch, FaUserCircle } from 'react-icons/fa';
 
 interface CustomHeaderProps {
   userName: string;
@@ -8,33 +9,26 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ userName }) => {
   return (
     <div style={styles.stickyHeader}>
       {/* safechain logo */}
-
       <div style={styles.header}>
         <div style={styles.welcomeContainer}>
           <p style={styles.welcomeText}>Welcome, {userName}!</p>
-          <img
-            src="path/to/person-circle-outline-icon.png"
-            alt="person-circle-outline"
-            style={{ width: '30px', height: '30px', color: '#fff' }}
-          />
+          <div style={styles.iconContainer}>
+            {/* Person profile icon */}
+            <FaUserCircle size={30} color="#fff" style={{ marginRight: '10px' }} />
+          </div>
         </div>
 
-        {/* Uncomment the following block if you want to include the description */}
         {/* <div style={styles.descriptionContainer}>
           <p style={styles.descriptionText}>What would you like to do?</p>
         </div> */}
 
         <div style={styles.searchContainer}>
-          <img
-            src="path/to/search-icon.png"
-            alt="search"
-            style={{ width: '20px', height: '20px', color: '#333', marginRight: '10px' }}
-          />
           <input
             type="text"
             style={styles.searchInput}
-            placeholder="Search..."
+            placeholder="Fast Search Records..."
           />
+          <FaSearch size={20} color="#333" style={styles.searchIcon} />
         </div>
       </div>
     </div>
@@ -47,32 +41,30 @@ const styles: Record<string, React.CSSProperties> = {
     top: '0',
     width: '100%',
     zIndex: '100',
+
   },
   header: {
-    backgroundColor: '#a53662',
+    backgroundColor: '#1D2430',
     padding: '16px',
     marginBottom: '10px',
+    borderRadius: 10,
   },
   welcomeContainer: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   welcomeText: {
     color: '#fff',
     fontSize: '18px',
-    marginRight: '10px',
   },
-  descriptionContainer: {
-    marginTop: '10px',
-  },
-  descriptionText: {
-    color: '#fff',
-    fontSize: '16px',
+  iconContainer: {
+    display: 'flex',
+    alignItems: 'center',
   },
   searchContainer: {
     display: 'flex',
-    flexDirection: 'row',
     alignItems: 'center',
     marginTop: '10px',
     backgroundColor: '#fff',
@@ -87,6 +79,15 @@ const styles: Record<string, React.CSSProperties> = {
     outline: 'none',
     backgroundColor: '#fff',
     borderRadius: '8px',
+    backgroundImage: 'url("path/to/search-icon.png")',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: '10px center',
+    paddingLeft: '40px', // Adjusted padding to accommodate the icon
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: '30px',
+    color: '#333'
   },
 };
 

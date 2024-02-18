@@ -5,17 +5,30 @@
   }
   
   .header {
-    background-color: #a53662;
+    background-color: #1D2430;
     color: white;
     text-align: center;
-    padding: 20px;
+    padding: 5px;
+    position: fixed;
+    top: 0;
+    width: 100vw;
   }
   
   .records-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
+    margin-top: 23vh;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .record-title{
+    color: black;
+    font-size: large;
+    font-weight: 800;
+  }
+  .record-date{
+    color: black;
   }
   
   .record-item {

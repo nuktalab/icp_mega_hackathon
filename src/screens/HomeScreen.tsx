@@ -1,14 +1,34 @@
 import React from 'react';
-import Explore from '../components/Cards';
-import CustomHeader from '../components/CustomHeader';
+import Explore from './../components/Cards';
+import CustomHeader from './../components/CustomHeader';
+import { profile } from '../declarations/profile';
+import { useState, useEffect } from 'react';
 
-const HomeScreen = () => {
-  const userName = 'Jane Doe';
+interface Props {
+  userName: string; // Explicitly define the type of userName
+}
+
+const HomeScreen: React.FC<Props> = ({ userName }) => {
+  const [username, setUsername] = useState<string>("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await profile.getUserData(userName);
+        console.log(result[0]);
+        // Use a fallback value to handle the case when result[0]?.name is undefined
+        setUsername(result[0]?.name || ""); 
+      } catch (error) {
+        console.log('Error fetching user data:', error);
+      }
+    };
+    fetchData(); // Call fetchData function inside useEffect
+  }, [userName]); // Add userName as a dependency to useEffect
 
   return (
     <div
       style={{
-        width: '100%',
+        width: '100vw',
         minHeight: '100vh',
         backgroundColor: 'white',
         display: 'flex',
@@ -19,38 +39,24 @@ const HomeScreen = () => {
       }}
     >
       <div style={{ width: '100%' }}>
-        <CustomHeader userName={userName} />
+        <CustomHeader userName={username} />
       </div>
 
       <div
         style={{
           width: '100%',
-          maxWidth: '600px',
-          margin: '0px auto',
           padding: '0px',
           borderRadius: '10px',
           paddingTop: '15px'
-          
         }}
       >
-        <div style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '10px', color: '#a53662'}}>
+        <div style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '10px', color: '#1D2430'}}>
           Records
         </div>
-        <div style={{ fontSize: '16px', fontWeight: '300', marginBottom: '20px', color: '#a53662' }}>
+        <div style={{ fontSize: '16px', fontWeight: '500', marginBottom: '40px', color: "#FBB040" }}>
           View your medical passport
         </div>
-        <Explore history={{
-                  push: function (path: string): void {
-                      throw new Error('Function not implemented.');
-                  }
-              }}        />
-
-        <div style={{ marginTop: '20px' }}>
-          <div>{/* Your content goes here */}</div>
-        </div>
-        {/* <div style={{ fontSize: '30px', fontWeight: 'bold' }}>
-              Explore
-        </div> */}
+        <Explore userId={userName} history={{ push: function (path: string): void { throw new Error('Function not implemented.'); } }} />
       </div>
     </div>
   );

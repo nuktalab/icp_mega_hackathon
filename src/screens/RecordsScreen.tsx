@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import './RecordsScreen.css'; // CSS for styling
 import { records } from '../declarations/records';
 
+interface RecordScreenProps {
+  userId: string; // Define the type of userId
+}
+
 interface Record {
   title: string;
   date: string;
@@ -12,17 +16,21 @@ interface Record {
   treatment: string;
 }
 
-const RecordsScreen: React.FC = () => {
+const RecordsScreen: React.FC<RecordScreenProps> = ({ userId }) => {
   const [recordsData, setRecordsData] = useState<Record[] | undefined>(undefined);
   const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
 
   useEffect(() => {
     const fetchMedicalRecord = async () => {
       try {
-        const fetchedRecord = await records.getMedicalRecord(BigInt(120));
-        console.log(fetchedRecord);
-        setRecordsData(fetchedRecord[0]);
-        console.log(fetchedRecord)
+        const fetchedRecord = await records.getMedicalRecord(userId);
+        if (fetchedRecord.length) {
+          
+          console.log(fetchedRecord[0]);
+          setRecordsData(fetchedRecord[0]);
+        } else {
+          console.error('Empty or unexpected response from server.');
+        }
       } catch (error) {
         console.error('Error fetching medical record:', error);
       }
@@ -30,6 +38,7 @@ const RecordsScreen: React.FC = () => {
 
     fetchMedicalRecord();
   }, []);
+
 
   const handleRecordClick = (record: Record) => {
     setSelectedRecord(record);

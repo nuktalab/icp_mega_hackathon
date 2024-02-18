@@ -1,142 +1,15 @@
-// import React, { useState, useEffect } from 'react';
-// import  {FontAwesomeIcon}  from '@fortawesome/react-fontawesome';
-// import  {faMedkit } from '@fortawesome/free-solid-svg-icons';
-// import { records } from '../declarations/records';
-
-// interface ExploreProps {
-//   history: {
-//     push: (path: string) => void;
-//   };
-// }
-
-// interface MedicalRecord {
-//   title: string;
-//   date: string;
-//   category: string;
-//   hospitalName: string;
-//   doctorName: string;
-//   description: string;
-//   treatment: string;
-// }
-
-// const Explore: React.FC<ExploreProps> = ({ history }) => {
-//   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-//   const [categories, setCategories] = useState<MedicalRecord[]>([]);
-
-//   useEffect(() => {
-//     const fetchMedicalRecord = async () => {
-//       try {
-//         const fetchedRecord = await records.getMedicalRecord(BigInt(120));
-//         // Check if fetchedRecord is not undefined before setting state
-//         if (fetchedRecord) {
-//           setCategories(fetchedRecord[0] as MedicalRecord[]);
-        
-//         }
-//       } catch (error) {
-//         console.error('Error fetching medical record:', error);
-//       }
-//     };
-
-//     fetchMedicalRecord();
-//   }, []);
-
-//   const handleCardPress = (categoryId: number) => {
-//     // Toggle the dropdown visibility for the selected category
-//     setSelectedCategory((prev) => (prev === categoryId ? null : categoryId));
-//   };
-
-//   const calculatePercentage = (occurrences: number, totalRecords: number) => {
-//     return ((occurrences / totalRecords) * 100).toFixed(2);
-//   };
-
-//   const generateCards = () => {
-//     const categoryCounts: { [key: string]: number } = {};
-
-//     categories.forEach((category) => {
-//       const categoryTitle = category.category;
-
-//       if (categoryCounts[categoryTitle]) {
-//         categoryCounts[categoryTitle]++;
-//       } else {
-//         categoryCounts[categoryTitle] = 1;
-//       }
-//     });
-
-//     const totalRecords = categories.length;
-
-//     return Object.keys(categoryCounts).map((categoryTitle, index) => {
-//       const occurrences = categoryCounts[categoryTitle];
-
-//       return (
-//         <div
-//           key={index}
-//           className={`card cardelevated ${selectedCategory === index ? 'selected' : ''}`}
-//           style={styles.card}
-//           onClick={() => handleCardPress(index)}
-//         >
-//           <div style={styles.cardContent}>
-//             <FontAwesomeIcon icon={faMedkit} size="4x" color="#333" className="icon" />
-//             <div className="title" style={styles.title}>
-//               {categoryTitle}
-//             </div>
-//           </div>
-//           {selectedCategory === index && (
-//             <div className="dropdown" style={styles.dropdown}>
-//               <p style={styles.dropdownText}>Number of Occurrences: {occurrences}</p>
-//               <p style={styles.dropdownText}>
-//                 Percentage of Total Records: {calculatePercentage(occurrences, totalRecords)}%
-//               </p>
-//             </div>
-//           )}
-//         </div>
-//       );
-//     });
-//   };
-
-//   return <div className="flexContainer">{generateCards()}</div>;
-// };
-
-// const styles: Record<string, React.CSSProperties> = {
-//   card: {
-//     flex: '0 0 calc(50% - 16px)',
-//     backgroundColor: '#f0f0f0',
-//     borderRadius: '8px',
-//     overflow: 'hidden',
-//     margin: '8px',
-//     cursor: 'pointer',
-//     transition: 'transform 0.3s ease-in-out',
-//     padding: '4px',
-//   },
-//   cardContent: {
-//     display: 'flex',
-//     alignItems: 'center',
-//     justifyContent: 'left',
-//     height: '100%',
-//   },
-//   title: {
-//     fontSize: '25px',
-//     marginLeft: '10px',
-//     color: 'black',
-//   },
-//   dropdown: {
-//     color: 'black', // Set the text color to black
-//   },
-//   dropdownText: {
-//     margin: '0',
-//   },
-// };
-
-// export default Explore;
-// Explore.tsx
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMedkit } from '@fortawesome/free-solid-svg-icons';
+import { faMedkit, faUserMd, faEye, faTooth, faHeartbeat, faCapsules, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom'; 
 import { records } from '../declarations/records';
+import { JSX } from 'react/jsx-runtime';
 
 interface ExploreProps {
   history: {
     push: (path: string) => void;
   };
+  userId: string; 
 }
 
 interface MedicalRecord {
@@ -149,147 +22,174 @@ interface MedicalRecord {
   treatment: string;
 }
 
-const Explore: React.FC<ExploreProps> = ({ history }) => {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [categories, setCategories] = useState<MedicalRecord[]>([]);
+const Explore: React.FC<ExploreProps> = ({ history, userId }) => {
+  const [recordsData, setRecordsData] = useState<MedicalRecord[] | undefined>(undefined);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showAnalytics, setShowAnalytics] = useState<boolean>(false);
+  const [categoryStats, setCategoryStats] = useState<{ recordCount: number; averageDescriptionLength: number } | null>(null);
 
-  // Dummy data for testing
-  const dummyData: MedicalRecord[] = [
-    {
-      title: 'Dummy Record 1',
-      date: '2024-02-05',
-      category: 'Category A',
-      hospitalName: 'Dummy Hospital A',
-      doctorName: 'Dr. Dummy A',
-      description: 'Dummy description A',
-      treatment: 'Dummy treatment A',
-    },
-    {
-      title: 'Dummy Record 2',
-      date: '2024-02-06',
-      category: 'Category B',
-      hospitalName: 'Dummy Hospital B',
-      doctorName: 'Dr. Dummy B',
-      description: 'Dummy description B',
-      treatment: 'Dummy treatment B',
-    },
-  ];
+  const categoriesData: { [key: string]: IconDefinition } = {
+    Vitals: faHeartbeat,
+    General: faUserMd,
+    Cardiology: faHeartbeat,
+    Ophthalmology: faEye,
+    Dentistry: faTooth,
+    Dermatology: faCapsules
+  };
 
   useEffect(() => {
-    // test data for testing
-    setCategories(dummyData);
+    const fetchMedicalRecord = async () => {
+      try {
+        const fetchedRecord = await records.getMedicalRecord(userId);
+        if (fetchedRecord.length) {
+          setRecordsData(fetchedRecord[0]);
+        } else {
+          console.error('Empty or unexpected response from server.');
+        }
+      } catch (error) {
+        console.error('Error fetching medical record:', error);
+      }
+    };
+
+    fetchMedicalRecord();
   }, []);
 
-  const handleCardPress = (categoryId: number) => {
-    setSelectedCategory((prev) => (prev === categoryId ? null : categoryId));
+  const handleCardPress = (category: string) => {
+    setSelectedCategory(category);
+    calculateCategoryStats(category);
+    setShowAnalytics(true);
   };
 
-  const calculatePercentage = (occurrences: number, totalRecords: number) => {
-    return ((occurrences / totalRecords) * 100).toFixed(2);
+  const calculateCategoryStats = (category: string) => {
+    if (!recordsData) return;
+
+    const categoryRecords = recordsData.filter(record => record.category === category);
+    const recordCount = categoryRecords.length;
+    const totalDescriptionLength = categoryRecords.reduce((acc, record) => acc + record.description.length, 0);
+    const averageDescriptionLength = totalDescriptionLength / recordCount || 0;
+
+    setCategoryStats({ recordCount, averageDescriptionLength });
   };
 
+  const closeAnalytics = () => {
+    setShowAnalytics(false);
+    setSelectedCategory(null);
+    setCategoryStats(null);
+  };
+
+  // Generate category cards
   const generateCards = () => {
-    const categoryCounts: { [key: string]: number } = {};
+    const rows: JSX.Element[] = [];
+    const recordsChunks = chunkArray(recordsData || [], 2); // Split recordsData into chunks of 2 records per row
 
-    categories.forEach((category) => {
-      const categoryTitle = category.category;
+    recordsChunks.forEach((chunk, rowIndex) => {
+      const cards = chunk.map((record, colIndex) => (
 
-      if (categoryCounts[categoryTitle]) {
-        categoryCounts[categoryTitle]++;
-      } else {
-        categoryCounts[categoryTitle] = 1;
-      }
-    });
-
-    const totalRecords = categories.length;
-
-    const cards = Object.keys(categoryCounts).map((categoryTitle, index) => {
-      const occurrences = categoryCounts[categoryTitle];
-
-      return (
-        <div
-          key={index}
-          className={`card cardelevated ${selectedCategory === index ? 'selected' : ''}`}
-          style={styles.card}
-          onClick={() => handleCardPress(index)}
-        >
-          <div style={styles.cardContent}>
-            <FontAwesomeIcon icon={faMedkit} size="4x" color="#333" className="icon" />
-            <div className="title" style={styles.title}>
-              {categoryTitle}
+          <div
+            className={`card cardelevated ${selectedCategory === record.category ? 'selected' : ''}`}
+            style={styles.card}
+            onClick={() => handleCardPress(record.category)}
+          >
+            <div style={styles.cardContent}>
+              <FontAwesomeIcon icon={categoriesData[record.category]} size="4x" color="#333" className="icon" />
+              <div className="title" style={styles.title}>
+                {record.category}
+              </div>
             </div>
           </div>
-          {selectedCategory === index && (
-            <div className="dropdown" style={styles.dropdown}>
-              <p style={styles.dropdownText}>Number of Occurrences: {occurrences}</p>
-              <p style={styles.dropdownText}>
-                Percentage of Total Records: {calculatePercentage(occurrences, totalRecords)}%
-              </p>
-            </div>
-          )}
+      
+      ));
+      
+      rows.push(
+        <div key={rowIndex} style={styles.row}>
+          {cards}
         </div>
       );
     });
-
-    // Split the cards into rows of two
-    const rows = [];
-    for (let i = 0; i < cards.length; i += 2) {
-      rows.push(
-        <div key={i / 2} style={styles.row}>
-          {cards.slice(i, i + 2)}
-        </div>
-      );
-    }
 
     return rows;
   };
 
-  return <div className="scrollContainer">{generateCards()}</div>;
+  // Function to split array into chunks
+  const chunkArray = (array: any[], size: number) => {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += size) {
+      chunks.push(array.slice(i, i + size));
+    }
+    return chunks;
+  };
+
+  return (
+    <div className="scrollContainer">
+      {recordsData && recordsData.length > 0 ? (
+        generateCards()
+      ) : (
+        <div>No records available</div>
+      )}
+      {showAnalytics && (
+        <div className="modal" style={styles.modal}>
+          <div className="modal-content">
+            <span className="close" onClick={closeAnalytics}>
+              &times;
+            </span>
+            <h2>{selectedCategory} Analytics</h2>
+            <p>Total Records: {categoryStats?.recordCount}</p>
+            <p>Average Description Length: {categoryStats?.averageDescriptionLength}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const styles: Record<string, React.CSSProperties> = {
-  scrollContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: 8,
-  },
   card: {
-    width: '48%',
-    height: 160,
+    width: '45%',
+    height: 80,
     borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: '#ffffff',
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
-  },
-  row: {
-    display: 'flex',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 16, 
-  },
-  cardelevated: {
     boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.25)',
     transition: 'box-shadow 0.3s ease-in-out',
     cursor: 'pointer',
+    marginRight: '10px',
+    marginBottom: '10px',
   },
-  icon: {
-    marginBottom: 16,
+  row: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginBottom: '10px',
+  },
+  cardContent: {
+    textAlign: 'center',
   },
   title: {
     fontSize: 12,
     fontWeight: '400',
-    // textAlign: 'center',
+    marginTop: '8px',
+    color: '#1D2430',
   },
-  dropdown: {
-    color: 'black',
+  modal: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  dropdownText: {
-    margin: '0',
-    fontSize: 12,
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: '20px',
+    borderRadius: '8px',
+    maxWidth: '80%',
+    maxHeight: '80%',
+    overflow: 'auto',
   },
 };
 
