@@ -1,6 +1,10 @@
-# SafeChain - react+vite+motoko
 
-### Get started directly in your browser:
+# SafeChain -- Your HealthCare passport!
+### Ensure the confidentiality and integrity of your health records on the blockchain-based SafeChain system, enjoy cross-border insurance and health management powered by the internet-computer.
+
+### Manage your health records globally with our advanced features and cutting-edge technology.
+### Get started directly in your browser: 
+- [https://laxgf-2iaaa-aaaao-a3htq-cai.icp0.io/](https://laxgf-2iaaa-aaaao-a3htq-cai.icp0.io/)
 
 
 ```sh
